@@ -1,0 +1,15 @@
+# Root ignores
+node_modules/
+client/node_modules/
+dist/
+client/dist/
+.vercel/
+
+# Env files
+.env
+.env.*
+
+# OS / editors
+.DS_Store
+Thumbs.db
+*.log

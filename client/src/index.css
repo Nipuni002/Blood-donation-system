@@ -1,0 +1,12 @@
+body { font-family: Arial, Helvetica, sans-serif; margin: 20px; }
+.container { max-width: 900px; margin: 0 auto; }
+header { display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px }
+.auth-wrap { display:flex; gap: 16px }
+.card { padding: 12px; border: 1px solid #ddd; border-radius: 6px; background:#fff }
+.card label { display:block; margin-top:8px; font-size:14px }
+.card input, .card select { width:100%; padding:8px; margin-top:4px }
+.card button { margin-top:12px; padding:8px 12px }
+.error { margin-top:10px; color: #b00020 }
+.info { margin-top:10px; color: #0b8043 }
+.donor-table { width:100%; border-collapse: collapse; margin-top:12px }
+.donor-table th, .donor-table td { border:1px solid #eee; padding:8px; text-align:left }
