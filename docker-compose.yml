@@ -1,0 +1,84 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: perndb
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  auth:
+    build: ./server/auth-service
+    image: yourhubuser/pern-auth:latest
+    environment:
+      JWT_SECRET: your_jwt_secret_here
+      PORT: 4000
+      DATABASE_URL: postgres://postgres:example@postgres:5432/perndb
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "4000:4000"
+
+  donor:
+    build: ./server/donor
+    image: yourhubuser/pern-donor:latest
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgres://postgres:example@postgres:5432/perndb
+      JWT_SECRET: your_jwt_secret_here
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+
+  request:
+    build: ./server/request-service
+    image: yourhubuser/pern-request:latest
+    environment:
+      PORT: 3002
+      DATABASE_URL: postgres://postgres:example@postgres:5432/perndb
+      JWT_SECRET: your_jwt_secret_here
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3002:3002"
+
+  appointment:
+    build: ./server/appointment-service
+    image: yourhubuser/pern-appointment:latest
+    environment:
+      PORT: 3010
+      JWT_SECRET: your_jwt_secret_here
+      DATABASE_URL: postgres://postgres:example@postgres:5432/perndb
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3010:3010"
+
+  client:
+    build: ./client
+    image: yourhubuser/pern-client:latest
+    depends_on:
+      - auth
+      - donor
+      - request
+      - appointment
+    ports:
+      - "5173:80"
+
+volumes:
+  pgdata:

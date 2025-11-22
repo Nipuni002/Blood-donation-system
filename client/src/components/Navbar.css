@@ -1,0 +1,194 @@
+/* Navbar.css - clean responsive header centered as a block */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root{
+  --bright-red: #E53935;
+  --health-blue: #1E88E5;
+  --cool-gray: #ECEFF1;
+  --graphite: #263238;
+  --white: #FFFFFF;
+}
+
+/* top fixed bar */
+.navbar{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background: var(--white);
+  box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+  border-bottom: 1px solid var(--cool-gray);
+  z-index: 1000;
+  overflow: visible;
+}
+
+/* main container centers the brand+menu as a single block */
+.nav-container{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 8px 1rem; /* vertical padding gives breathing room */
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center; /* center the header block */
+  align-items: center;
+  min-height: 64px; /* ensure minimum height */
+  position: relative; /* allow absolute positioning inside */
+}
+
+/* simple inner flex so brand sits immediately left of the menu */
+.nav-content{
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  justify-content: space-between; /* brand left, menu center, user right */
+}
+
+.nav-brand{
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.nav-logo{
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--graphite);
+}
+
+.logo-icon{ font-size: 1.7rem; color: var(--bright-red); }
+.logo-text{ color: var(--bright-red); }
+
+/* nav menu: keep items on a single line for admin; allow horizontal scroll when needed */
+.nav-menu{
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: nowrap; /* keep on one line */
+  justify-content: center;
+  flex: 1 1 auto; /* allow menu to take available space and center items */
+  overflow-x: auto; /* allow horizontal scroll instead of wrapping */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+/* make scroll bar less intrusive on desktop */
+.nav-menu::-webkit-scrollbar{ height:6px; }
+.nav-menu::-webkit-scrollbar-thumb{ background: rgba(0,0,0,0.12); border-radius: 6px; }
+
+.nav-btn{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0.9rem; /* reduce vertical padding to avoid overflow */
+  background: transparent;
+  border: 1px solid var(--cool-gray);
+  border-radius: 10px;
+  color: var(--graphite);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.92rem;
+  text-decoration: none;
+  white-space: nowrap; /* keep icon+text together */
+  flex: 0 1 auto; /* allow shrinking but prefer intrinsic size */
+  line-height: 1;
+  box-sizing: border-box;
+}
+
+.nav-btn:hover{ background: var(--cool-gray); border-color: var(--health-blue); }
+
+.nav-btn-primary{ background: var(--bright-red); color: var(--white); border: none; }
+.nav-btn-logout{ border-color: var(--bright-red); color: var(--bright-red); }
+
+.nav-icon{ font-size: 1.05rem; }
+
+/* optional user block (right side) */
+.user-section{ display: flex; align-items: center; gap: 0.6rem; margin-left: 0.6rem; }
+.user-avatar{ width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--cool-gray); }
+
+/* Use flex layout instead of absolute positioning so the user block stays to the right
+   without overlapping or stacking nav buttons when the menu wraps. */
+.user-section{
+  position: static;
+  margin-left: 0.6rem;
+  flex: 0 0 auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px){
+  .nav-container{ padding: 0 0.75rem; }
+  .nav-btn{ padding: 0.45rem 0.7rem; font-size: 0.86rem; }
+}
+
+@media (max-width: 640px){
+  .nav-content{ gap: 0.6rem; }
+  .nav-logo{ font-size: 1.1rem; }
+  .logo-icon{ font-size: 1.4rem; }
+  /* on very small screens hide button text to save space (icons remain) */
+  .nav-btn span:not(.nav-icon){ display: none; }
+  .nav-btn{ padding: 0.38rem 0.55rem; }
+  .user-section{ display: none; }
+}
+
+/* small visual polish */
+.nav-logo:hover{ transform: translateY(-1px); }
+    
+
+/* Mobile Menu Button for Small Screens */
+.mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  color: var(--graphite);
+}
+
+@media (max-width: 640px) {
+  .mobile-menu-btn {
+    display: block;
+  }
+  
+  .nav-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--white);
+    flex-direction: column;
+    padding: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-top: 1px solid var(--cool-gray);
+    display: none;
+  }
+  
+  .nav-menu.mobile-open {
+    display: flex;
+  }
+  
+  .nav-btn {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  .nav-btn span:not(.nav-icon) {
+    display: block;
+  }
+  
+  .user-section {
+    flex-direction: column;
+    width: 100%;
+    border-left: none;
+    margin-left: 0;
+    padding-left: 0;
+    border-top: 1px solid var(--cool-gray);
+    padding-top: 1rem;
+  }
+}
