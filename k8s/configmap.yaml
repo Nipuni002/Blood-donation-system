@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shared-config
+  namespace: blood-donation
+data:
+  DATABASE_URL: postgres://postgres:example@postgres:5432/perndb

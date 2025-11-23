@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: request
+  namespace: blood-donation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: request
+  template:
+    metadata:
+      labels:
+        app: request
+    spec:
+      containers:
+        - name: request
+          image: yourhubuser/pern-request:latest
+          ports:
+            - containerPort: 3002
+          env:
+            - name: PORT
+              value: "3002"
+            - name: DATABASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: shared-config
+                  key: DATABASE_URL
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: JWT_SECRET
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3002
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3002
+            initialDelaySeconds: 30
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: request
+  namespace: blood-donation
+spec:
+  selector:
+    app: request
+  ports:
+    - port: 3002
+      targetPort: 3002
+      name: http
+  type: ClusterIP
