@@ -69,9 +69,4 @@ The **Blood Donation System** is a microservice-based web application designed t
 ### Local (Docker Compose)
 ```bash
 docker-compose up --build
-
-<img width="1897" height="925" alt="Screenshot (105)" src="https://github.com/user-attachments/assets/d6f32f7f-311d-464e-bf00-258720d52ce8" />
-
-<img width="1894" height="918" alt="Screenshot (96)" src="https://github.com/user-attachments/assets/1a0bf009-0bbf-40a1-a9ff-e671c058ccc0" />
-
-<img width="1899" height="887" alt="Screenshot (102)" src="https://github.com/user-attachments/assets/57fd32f5-154d-4974-af7b-6c1485d8c156" />
+ 
