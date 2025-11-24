@@ -6,7 +6,7 @@ The **Blood Donation System** is a microservice-based web application designed t
 
 ## 🌐 Features
 
-- Secure authentication with **JWT** and password hashing (**bcrypt**).  
+- Secure authentication with **JWT**.  
 - Donor and request management via dedicated backend services.  
 - Appointment scheduling microservice with migration support.  
 - Modular microservices for independent scaling and updates.  
@@ -58,7 +58,7 @@ The **Blood Donation System** is a microservice-based web application designed t
 | Frontend | React + Vite |
 | Backend | Node.js + Express |
 | Database | PostgreSQL |
-| Auth | JWT + bcrypt |
+| Auth | JWT |
 | DevOps | Docker, Docker Compose, Kubernetes, GitHub Actions |
 | Optional Hosting | Vercel (Frontend) |
 
@@ -69,3 +69,9 @@ The **Blood Donation System** is a microservice-based web application designed t
 ### Local (Docker Compose)
 ```bash
 docker-compose up --build
+
+![alt text](<Screenshot (105)-1.png>)
+
+![alt text](<Screenshot (96).png>)
+
+![alt text](<Screenshot (102).png>)
