@@ -1,4 +1,10 @@
 {
+  "name": "blood-donation-system",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "cd client && npm install && npm run build",
+    "install": "cd client && npm install"
+  },
   "dependencies": {
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
