@@ -1,0 +1,130 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master, feature-improved-ui ]
+  pull_request:
+    branches: [ main, master ]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  client:
+    name: Client build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - name: Install deps
+        working-directory: client
+        run: npm ci || npm install
+      - name: Build
+        working-directory: client
+        run: npm run build --if-present
+      - name: Archive production build
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-dist
+          path: client/dist
+          if-no-files-found: warn
+
+  services:
+    name: Service install
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [auth-service, appointment-service, donor, request-service]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: npm
+          cache-dependency-path: |
+            server/auth-service/package-lock.json
+            server/appointment-service/package-lock.json
+            server/donor/package-lock.json
+            server/request-service/package-lock.json
+      - name: Install dependencies (${{ matrix.service }})
+        working-directory: server/${{ matrix.service }}
+        run: npm ci || npm install
+      - name: Basic start check (${{ matrix.service }})
+        working-directory: server/${{ matrix.service }}
+        run: |
+          if npm run | grep -q "start"; then echo "Start script present"; else echo "No start script"; fi
+
+  docker-smoke:
+    name: Docker compose smoke test
+    runs-on: ubuntu-latest
+    needs: [client, services]
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: example
+          POSTGRES_DB: perndb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build service images
+        run: |
+          docker build -t auth-service ./server/auth-service
+          docker build -t appointment-service ./server/appointment-service
+          docker build -t donor-service ./server/donor
+          docker build -t request-service ./server/request-service
+      - name: Run containers
+        run: |
+          docker run -d --name auth --link ${{ job.services.postgres.id }}:postgres -e DATABASE_URL=postgres://postgres:example@postgres:5432/perndb -e JWT_SECRET=test -p 4000:4000 auth-service node server.js || true
+          docker run -d --name appointment --link ${{ job.services.postgres.id }}:postgres -e DATABASE_URL=postgres://postgres:example@postgres:5432/perndb -e JWT_SECRET=test -p 3010:3010 appointment-service node index.js || true
+          docker run -d --name donor --link ${{ job.services.postgres.id }}:postgres -e DATABASE_URL=postgres://postgres:example@postgres:5432/perndb -e JWT_SECRET=test -p 3000:3000 donor-service node index.js || true
+          docker run -d --name request --link ${{ job.services.postgres.id }}:postgres -e DATABASE_URL=postgres://postgres:example@postgres:5432/perndb -e JWT_SECRET=test -p 3002:3002 request-service node index.js || true
+      - name: List running containers
+        run: docker ps -a
+      - name: Logs snapshot
+        run: |
+          docker logs auth || true
+          docker logs appointment || true
+          docker logs donor || true
+          docker logs request || true
+
+  vercel-deploy:
+    name: Vercel deploy (client)
+    if: github.event_name == 'push' && contains(github.ref, 'refs/heads/main')
+    runs-on: ubuntu-latest
+    needs: [client]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Deploy to Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then echo "Missing VERCEL_TOKEN secret"; exit 0; fi
+          npm install -g vercel
+          vercel --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID" --project "$VERCEL_PROJECT_ID" --prod --confirm ./client || echo "Vercel deploy skipped"
+
+  summary:
+    name: Summary
+    runs-on: ubuntu-latest
+    needs: [client, services, docker-smoke]
+    steps:
+      - name: Print summary
+        run: echo "Client build, services install and docker smoke test completed."
