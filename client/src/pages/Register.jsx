@@ -6,7 +6,6 @@ export default function Register() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [role, setRole] = useState('user')
   const [message, setMessage] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -16,7 +15,7 @@ export default function Register() {
     setIsLoading(true)
     
     try {
-      const res = await register({ name, email, password, role })
+      const res = await register({ name, email, password, role: 'user' })
       if (res.error) {
         setMessage({ type: 'error', text: res.error })
       } else {
@@ -25,7 +24,6 @@ export default function Register() {
         setName('')
         setEmail('')
         setPassword('')
-        setRole('user')
       }
     } catch (error) {
       setMessage({ type: 'error', text: 'An error occurred. Please try again.' })
@@ -122,28 +120,6 @@ export default function Register() {
                   required
                   minLength="6"
                 />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="role">Account Type</label>
-              <div className="input-container">
-                <span className="input-icon">🎯</span>
-                <select 
-                  id="role"
-                  value={role} 
-                  onChange={e => setRole(e.target.value)}
-                >
-                  <option value="user">🧑‍💼 Regular User</option>
-                  <option value="admin">👨‍💼 Administrator</option>
-                </select>
-              </div>
-              <div className="role-description">
-                {role === 'user' ? (
-                  <p>Register as a donor or to request blood donations</p>
-                ) : (
-                  <p>Administrator access for managing the platform</p>
-                )}
               </div>
             </div>
 
